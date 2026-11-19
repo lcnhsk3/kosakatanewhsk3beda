@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no" class="notranslate">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="google" content="notranslate" />
+  <title>Review Kosakata New HSK 3 (Tidak Ada di HSK 3 Lama)</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts untuk UI Latin & Pinyin yang tajam di proyektor -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Proteksi menyeluruh agar teks tidak pernah terblok/terseleksi saat diklik cepat di kelas */
+    *, *::before, *::after {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      touch-action: manipulation;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Font wajib FZKai untuk seluruh huruf Mandarin (Hanzi) */
+    .hanzi-font {
+      font-family: 'FZKai', 'FZKTK', 'KaiTi', '楷体', 'STKaiti', 'DFKai-SB', serif !important;
+      font-weight: 400;
+      line-height: 1.12;
+    }
+
+    /* Ukuran Hanzi super besar untuk tampilan 1 kosakata dalam 1 layar penuh */
+    .hanzi-single-main {
+      font-size: clamp(4.75rem, 12.5vw, 9.75rem);
+      text-shadow: 0 6px 24px rgba(15, 23, 42, 0.28), 0 2px 5px rgba(15, 23, 42, 0.2);
+      letter-spacing: 0.04em;
+    }
+
+    .hanzi-single-main.hanzi-long {
+      font-size: clamp(3.5rem, 9.2vw, 7.25rem);
+    }
+
+    .hanzi-single-main.hanzi-extra-long {
+      font-size: clamp(2.75rem, 7.2vw, 5.75rem);
+    }
+
+    /* Perspektif 3D Stage & Animasi Flip Kartu */
+    .stage-perspective {
+      perspective: 1600px;
+    }
+
+    .card-scene {
+      perspective: 1600px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+      will-change: transform;
+    }
+
+    .card-scene:hover .card-inner:not(.is-flipped) {
+      transform: translateY(-4px) scale(1.008);
+    }
+
+    .card-scene:active .card-inner:not(.is-flipped) {
+      transform: scale(0.985);
+    }
+
+    .card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-scene:hover .card-inner.is-flipped {
+      transform: rotateY(180deg) translateY(-4px) scale(1.008);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 2rem;
+      overflow: hidden;
+    }
+
+    .card-face-back {
+      transform: rotateY(180deg);
+    }
+
+    /* =========================================================================
+       ANIMASI PERPINDAHAN ANTAR FLASHCARD (NEXT, PREV & ACAK ULANG)
+       ========================================================================= */
+    @keyframes slideOutNext {
+      0% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-68%) rotateY(-26deg) rotateZ(-5deg) scale(0.85);
+      }
+    }
+
+    @keyframes slideInNext {
+      0% {
+        opacity: 0;
+        transform: translateX(68%) rotateY(26deg) rotateZ(5deg) scale(0.85);
+      }
+      68% {
+        opacity: 1;
+        transform: translateX(-14px) rotateY(-4deg) rotateZ(-1deg) scale(1.015);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+    }
+
+    @keyframes slideOutPrev {
+      0% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(68%) rotateY(26deg) rotateZ(5deg) scale(0.85);
+      }
+    }
+
+    @keyframes slideInPrev {
+      0% {
+        opacity: 0;
+        transform: translateX(-68%) rotateY(-26deg) rotateZ(-5deg) scale(0.85);
+      }
+      68% {
+        opacity: 1;
+        transform: translateX(14px) rotateY(4deg) rotateZ(1deg) scale(1.015);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0) rotateY(0deg) rotateZ(0deg) scale(1);
+      }
+    }
+
+    @keyframes cardShuffleSpinIn {
+      0% {
+        opacity: 0;
+        transform: rotateY(-165deg) scale(0.72) translateY(24px);
+      }
+      65% {
+        opacity: 1;
+        transform: rotateY(10deg) scale(1.03) translateY(-4px);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateY(0deg) scale(1) translateY(0);
+      }
+    }
+
+    .anim-exit-next {
+      animation: slideOutNext 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      pointer-events: none;
+    }
+
+    .anim-enter-next {
+      animation: slideInNext 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .anim-exit-prev {
+      animation: slideOutPrev 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      pointer-events: none;
+    }
+
+    .anim-enter-prev {
+      animation: slideInPrev 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .anim-shuffle-in {
+      animation: cardShuffleSpinIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Animasi latar belakang hidup di dalam setiap kartu */
+    @keyframes floatBubbleSlow {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(14px, -22px, 0) scale(1.08); }
+    }
+
+    @keyframes floatBubbleReverse {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-16px, -18px, 0) scale(0.94); }
+    }
+
+    @keyframes pulseAura {
+      0%, 100% { opacity: 0.35; transform: scale(0.95); }
+      50% { opacity: 0.72; transform: scale(1.12); }
+    }
+
+    @keyframes waveDrift {
+      0% { transform: translateX(0); }
+      50% { transform: translateX(-18%); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes sheenSweep {
+      0% { transform: translateX(-120%) skewX(-20deg); }
+      45%, 100% { transform: translateX(240%) skewX(-20deg); }
+    }
+
+    @keyframes sparkleFly {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.45) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(240deg);
+      }
+    }
+
+    .sparkle-particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.75rem;
+      z-index: 40;
+      animation: sparkleFly 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .bubble-1 { animation: floatBubbleSlow 6.5s ease-in-out infinite; }
+    .bubble-2 { animation: floatBubbleReverse 7.8s ease-in-out infinite; }
+    .aura-pulse { animation: pulseAura 4.5s ease-in-out infinite; }
+    .wave-motion { animation: waveDrift 9s ease-in-out infinite; }
+    .sheen-glint { animation: sheenSweep 6.5s ease-in-out infinite; }
+  </style>
+</head>
+<body translate="no" class="notranslate h-screen overflow-hidden flex flex-col justify-between bg-gradient-to-br from-slate-100 via-sky-50/80 to-indigo-100/80 text-slate-900">
+
+  <!-- ==================== MODAL PETUNJUK PENGERJAAN (OPSIONAL VIA TOMBOL PETUNJUK) ==================== -->
+  <div id="instructionsModal" translate="no" class="notranslate hidden fixed inset-0 z-50 items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+    <div translate="no" class="notranslate w-full max-w-3xl rounded-3xl bg-white shadow-2xl border-2 border-indigo-200 overflow-hidden my-auto">
+      
+      <!-- Header Modal Petunjuk -->
+      <div class="bg-gradient-to-r from-indigo-700 via-blue-600 to-sky-500 px-5 sm:px-8 py-4 sm:py-5 text-white flex items-center justify-between gap-3">
+        <div>
+          <span class="inline-block px-3 py-0.5 rounded-full bg-white/20 text-xs sm:text-sm font-extrabold tracking-wider uppercase mb-1">
+            New HSK 3 • Kosakata Tambahan Baru (396 Kosakata Acak)
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-black tracking-tight">
+            PETUNJUK BELAJAR FLASHCARD
+          </h2>
+        </div>
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center border border-white/30 shrink-0">
+          <span class="hanzi-font text-3xl sm:text-4xl text-white">词</span>
+        </div>
+      </div>
+
+      <!-- Isi Petunjuk -->
+      <div class="p-5 sm:p-7 space-y-3.5 bg-gradient-to-b from-white to-slate-50">
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-indigo-50/90 border border-indigo-200/80">
+          <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shrink-0">1</span>
+          <p class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug pt-1">
+            Tebak bunyi Pinyin dan arti dari Hanzi yang tampil di layar penuh, lalu klik kartu untuk membaliknya.
+          </p>
+        </div>
+
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-200/80">
+          <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-lg flex items-center justify-center shrink-0">2</span>
+          <p class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug pt-1">
+            Salinlah kosakata beserta Hanzi, Pinyin, dan artinya dari daftar Kosakata New HSK 3 (yang tidak ada di HSK 3 lama).
+          </p>
+        </div>
+
+        <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200/80">
+          <span class="w-9 h-9 rounded-xl bg-amber-500 text-white font-black text-lg flex items-center justify-center shrink-0">3</span>
+          <p class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug pt-1">
+            Klik tombol <strong>Next ➔</strong> (atau panah kanan) untuk berpindah ke kosakata berikutnya. Urutan otomatis teracak saat selesai atau mulai baru.
+          </p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex justify-end">
+          <button id="btnCloseInstructions" type="button" class="w-full sm:w-auto px-7 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 active:scale-95 text-white font-black text-base sm:text-lg shadow-lg transition cursor-pointer">
+            ✓ Lanjutkan Belajar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== HEADER: JUDUL, PROGRES & TOMBOL MULAI BARU ==================== -->
+  <header translate="no" class="notranslate w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm px-3 sm:px-6 py-2 sm:py-2.5 shrink-0 z-20">
+    <div class="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2">
+
+      <!-- Kiri: Judul Utama & Tombol Petunjuk -->
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-rose-500 via-amber-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md shrink-0">
+          <span class="hanzi-font text-xl sm:text-2xl leading-none">词</span>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-lg lg:text-xl font-black tracking-tight text-slate-900 truncate">
+            Review Kosakata New HSK 3 (Tidak Ada di HSK 3 Lama)
+          </h1>
+          <p class="hidden sm:block text-xs font-semibold text-slate-500">
+            1 Kosakata per Layar Penuh • Klik Kartu untuk Balik • Urutan Teracak Otomatis
+          </p>
+        </div>
+      </div>
+
+      <!-- Kanan: Putaran, Progres Kartu, Mulai Baru & Petunjuk -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <!-- Badge Putaran & Nomor Kartu -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-900 text-white shadow-sm">
+          <span id="roundBadge" class="px-2 py-0.5 rounded-lg bg-indigo-500 text-white text-[11px] sm:text-xs font-extrabold">
+            Putaran 1
+          </span>
+          <span id="progressText" class="text-xs sm:text-sm lg:text-base font-black tracking-wide text-amber-300 tabular-nums">
+            1 / 396
+          </span>
+        </div>
+
+        <!-- Tombol Mulai Baru (Acak Ulang Semua Kosakata) -->
+        <button id="btnNewStart" type="button" title="Mulai Baru & Acak Ulang 396 Kosakata"
+          class="px-3 sm:px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-purple-800 border border-purple-200 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+          <span>🔀</span>
+          <span>Mulai Baru</span>
+        </button>
+
+        <!-- Tombol Petunjuk -->
+        <button id="btnOpenInstructions" type="button"
+          class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 active:scale-95 text-indigo-800 border border-indigo-200 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition cursor-pointer">
+          <span>📋</span>
+          <span class="hidden sm:inline">Petunjuk</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Bilah Progres Tipis -->
+    <div class="max-w-[1440px] mx-auto mt-2">
+      <div class="w-full h-2 bg-slate-200/90 rounded-full overflow-hidden">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-600 via-blue-500 to-sky-400 rounded-full transition-all duration-300" style="width: 0.25%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== AREA UTAMA: 1 KARTU FLASHCARD BESAR PENUH ==================== -->
+  <main translate="no" class="notranslate flex-1 min-h-0 w-full max-w-[1440px] mx-auto px-4 sm:px-8 py-3 sm:py-5 flex items-center justify-center overflow-hidden">
+    <div id="cardStage" class="stage-perspective notranslate w-full max-w-4xl h-full max-h-[680px] flex items-center justify-center">
+      <!-- Kartu Flashcard Tunggal Dirender di Sini -->
+    </div>
+  </main>
+
+  <!-- ==================== BAR NAVIGASI BAWAH: SEBELUMNYA & TOMBOL NEXT ==================== -->
+  <section translate="no" aria-label="Navigasi Kosakata" class="notranslate w-full bg-white/90 backdrop-blur-md border-t border-slate-200/80 px-3 sm:px-6 py-2.5 shrink-0 z-20">
+    <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-3">
+
+      <!-- Tombol Sebelumnya -->
+      <button id="btnPrev" type="button"
+        class="px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-white hover:bg-slate-100 active:scale-95 disabled:opacity-35 disabled:pointer-events-none text-slate-800 border-2 border-slate-300 font-extrabold text-sm sm:text-base shadow-sm transition cursor-pointer">
+        ⬅ Sebelumnya
+      </button>
+
+      <!-- Petunjuk Keyboard di Tengah -->
+      <div class="hidden md:flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-2xl border border-slate-200">
+        <span>💡 Klik kartu / tekan <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-700">Spasi</kbd> untuk balik</span>
+        <span>•</span>
+        <span>Tekan <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-700">→</kbd> untuk Next</span>
+      </div>
+
+      <!-- Tombol NEXT Utama -->
+      <button id="btnNext" type="button"
+        class="px-7 sm:px-10 py-2.5 sm:py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 active:scale-95 text-white font-black text-base sm:text-lg lg:text-xl tracking-wide shadow-lg shadow-blue-500/30 border border-blue-400/50 transition transform hover:scale-[1.03] cursor-pointer flex items-center gap-2">
+        <span id="btnNextLabel">Next</span>
+        <span>➔</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer translate="no" class="notranslate w-full bg-slate-900 text-slate-300 text-center py-1 px-4 text-xs sm:text-sm font-semibold tracking-wider shrink-0">
+    by lcnpalembang-08994477998
+  </footer>
+
+  <!-- ==================== SCRIPT APLIKASI FLASHCARD ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Proteksi global anti-select, anti-copy, anti-drag & anti-contextmenu
+      document.addEventListener("selectstart", (e) => e.preventDefault());
+      document.addEventListener("dragstart", (e) => e.preventDefault());
+      document.addEventListener("copy", (e) => e.preventDefault());
+      document.addEventListener("cut", (e) => e.preventDefault());
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      // Daftar lengkap 396 kosakata New HSK 3 (yang tidak ada di HSK 3 lama)
+      const VOCAB_LIST = [
+        { hanzi: "爱情片", pinyin: "àiqíngpiàn", arti: "film romantis", unit: "New HSK 3" },
+        { hanzi: "奥运会", pinyin: "Àoyùnhuì", arti: "Olimpiade", unit: "New HSK 3" },
+        { hanzi: "白色", pinyin: "báisè", arti: "warna putih", unit: "New HSK 3" },
+        { hanzi: "白天", pinyin: "báitiān", arti: "siang hari", unit: "New HSK 3" },
+        { hanzi: "办", pinyin: "bàn", arti: "mengurus / melakukan", unit: "New HSK 3" },
+        { hanzi: "半天", pinyin: "bàntiān", arti: "setengah hari / waktu yang lama", unit: "New HSK 3" },
+        { hanzi: "帮", pinyin: "bāng", arti: "membantu", unit: "New HSK 3" },
+        { hanzi: "包子", pinyin: "bāozi", arti: "bakpao", unit: "New HSK 3" },
+        { hanzi: "北京大学", pinyin: "Běijīng Dàxué", arti: "Universitas Peking", unit: "New HSK 3" },
+        { hanzi: "北京烤鸭", pinyin: "Běijīng kǎoyā", arti: "bebek panggang Beijing", unit: "New HSK 3" },
+        { hanzi: "北京南站", pinyin: "Běijīng Nánzhàn", arti: "Stasiun Kereta Beijing Selatan", unit: "New HSK 3" },
+        { hanzi: "本子", pinyin: "běnzi", arti: "buku catatan", unit: "New HSK 3" },
+        { hanzi: "笔", pinyin: "bǐ", arti: "pena / alat tulis", unit: "New HSK 3" },
+        { hanzi: "笔记", pinyin: "bǐjì", arti: "catatan", unit: "New HSK 3" },
+        { hanzi: "边", pinyin: "biān", arti: "sisi / sebelah", unit: "New HSK 3" },
+        { hanzi: "变", pinyin: "biàn", arti: "berubah", unit: "New HSK 3" },
+        { hanzi: "变成", pinyin: "biànchéng", arti: "berubah menjadi", unit: "New HSK 3" },
+        { hanzi: "遍", pinyin: "biàn", arti: "kali (frekuensi tindakan)", unit: "New HSK 3" },
+        { hanzi: "表演", pinyin: "biǎoyǎn", arti: "mempertunjukkan / pertunjukan", unit: "New HSK 3" },
+        { hanzi: "别的", pinyin: "biéde", arti: "yang lain", unit: "New HSK 3" },
+        { hanzi: "冰", pinyin: "bīng", arti: "es", unit: "New HSK 3" },
+        { hanzi: "病", pinyin: "bìng", arti: "penyakit / sakit", unit: "New HSK 3" },
+        { hanzi: "病人", pinyin: "bìngrén", arti: "pasien", unit: "New HSK 3" },
+        { hanzi: "不好意思", pinyin: "bù hǎoyìsi", arti: "maaf / malu / sungkan", unit: "New HSK 3" },
+        { hanzi: "不见", pinyin: "bùjiàn", arti: "hilang / tidak terlihat", unit: "New HSK 3" },
+        { hanzi: "不错", pinyin: "bùcuò", arti: "lumayan / bagus", unit: "New HSK 3" },
+        { hanzi: "不要", pinyin: "bùyào", arti: "jangan", unit: "New HSK 3" },
+        { hanzi: "不用", pinyin: "bùyòng", arti: "tidak perlu", unit: "New HSK 3" },
+        { hanzi: "才", pinyin: "cái", arti: "baru saja / barulah", unit: "New HSK 3" },
+        { hanzi: "草地", pinyin: "cǎodì", arti: "padang rumput / lapangan rumput", unit: "New HSK 3" },
+        { hanzi: "草原", pinyin: "cǎoyuán", arti: "padang rumput luas (stepa)", unit: "New HSK 3" },
+        { hanzi: "查", pinyin: "chá", arti: "memeriksa / mencari informasi", unit: "New HSK 3" },
+        { hanzi: "差不多", pinyin: "chàbuduō", arti: "hampir sama / kurang lebih", unit: "New HSK 3" },
+        { hanzi: "尝", pinyin: "cháng", arti: "mencicipi", unit: "New HSK 3" },
+        { hanzi: "常", pinyin: "cháng", arti: "sering", unit: "New HSK 3" },
+        { hanzi: "常常", pinyin: "chángcháng", arti: "sering kali", unit: "New HSK 3" },
+        { hanzi: "常见", pinyin: "chángjiàn", arti: "umum dijumpai", unit: "New HSK 3" },
+        { hanzi: "常用", pinyin: "chángyòng", arti: "sering digunakan", unit: "New HSK 3" },
+        { hanzi: "唱", pinyin: "chàng", arti: "menyanyi", unit: "New HSK 3" },
+        { hanzi: "车", pinyin: "chē", arti: "kendaraan / mobil", unit: "New HSK 3" },
+        { hanzi: "车站", pinyin: "chēzhàn", arti: "halte / stasiun", unit: "New HSK 3" },
+        { hanzi: "充电宝", pinyin: "chōngdiànbǎo", arti: "power bank", unit: "New HSK 3" },
+        { hanzi: "出发", pinyin: "chūfā", arti: "berangkat", unit: "New HSK 3" },
+        { hanzi: "出国", pinyin: "chūguó", arti: "pergi ke luar negeri", unit: "New HSK 3" },
+        { hanzi: "出门", pinyin: "chūmén", arti: "keluar rumah", unit: "New HSK 3" },
+        { hanzi: "出去", pinyin: "chūqù", arti: "pergi keluar", unit: "New HSK 3" },
+        { hanzi: "出生", pinyin: "chūshēng", arti: "lahir", unit: "New HSK 3" },
+        { hanzi: "出院", pinyin: "chūyuàn", arti: "keluar dari rumah sakit", unit: "New HSK 3" },
+        { hanzi: "初中", pinyin: "chūzhōng", arti: "SMP", unit: "New HSK 3" },
+        { hanzi: "除了……以外", pinyin: "chúle...yǐwài", arti: "selain...", unit: "New HSK 3" },
+        { hanzi: "床", pinyin: "chuáng", arti: "tempat tidur", unit: "New HSK 3" },
+        { hanzi: "春天", pinyin: "chūntiān", arti: "musim semi", unit: "New HSK 3" },
+        { hanzi: "春节", pinyin: "Chūnjié", arti: "Tahun Baru Imlek", unit: "New HSK 3" },
+        { hanzi: "词", pinyin: "cí", arti: "kata", unit: "New HSK 3" },
+        { hanzi: "从小", pinyin: "cóngxiǎo", arti: "sejak kecil", unit: "New HSK 3" },
+        { hanzi: "打", pinyin: "dǎ", arti: "memukul / bermain (olahraga)", unit: "New HSK 3" },
+        { hanzi: "打车", pinyin: "dǎchē", arti: "naik taksi", unit: "New HSK 3" },
+        { hanzi: "打开", pinyin: "dǎkāi", arti: "membuka", unit: "New HSK 3" },
+        { hanzi: "大熊猫", pinyin: "dàxióngmāo", arti: "panda raksasa", unit: "New HSK 3" },
+        { hanzi: "大兴机场", pinyin: "Dàxīng Jīchǎng", arti: "Bandara Daxing", unit: "New HSK 3" },
+        { hanzi: "大衣", pinyin: "dàyī", arti: "mantel / jaket panjang", unit: "New HSK 3" },
+        { hanzi: "大概", pinyin: "dàgài", arti: "kira-kira / mungkin", unit: "New HSK 3" },
+        { hanzi: "大人", pinyin: "dàren", arti: "orang dewasa", unit: "New HSK 3" },
+        { hanzi: "大小", pinyin: "dàxiǎo", arti: "ukuran (besar kecil)", unit: "New HSK 3" },
+        { hanzi: "大学生", pinyin: "dàxuéshēng", arti: "mahasiswa", unit: "New HSK 3" },
+        { hanzi: "大学", pinyin: "dàxué", arti: "universitas", unit: "New HSK 3" },
+        { hanzi: "但", pinyin: "dàn", arti: "tetapi", unit: "New HSK 3" },
+        { hanzi: "到处", pinyin: "dàochù", arti: "di mana-mana", unit: "New HSK 3" },
+        { hanzi: "得", pinyin: "děi", arti: "harus", unit: "New HSK 3" },
+        { hanzi: "得分", pinyin: "défēn", arti: "mencetak skor / poin", unit: "New HSK 3" },
+        { hanzi: "得到", pinyin: "dédào", arti: "mendapatkan", unit: "New HSK 3" },
+        { hanzi: "第", pinyin: "dì", arti: "ke- (awalan bilangan tingkat)", unit: "New HSK 3" },
+        { hanzi: "地点", pinyin: "dìdiǎn", arti: "lokasi / tempat", unit: "New HSK 3" },
+        { hanzi: "电影院", pinyin: "diànyǐngyuàn", arti: "bioskop", unit: "New HSK 3" },
+        { hanzi: "电子书", pinyin: "diànzǐshū", arti: "buku elektronik (e-book)", unit: "New HSK 3" },
+        { hanzi: "电", pinyin: "diàn", arti: "listrik", unit: "New HSK 3" },
+        { hanzi: "丢", pinyin: "diū", arti: "hilang / membuang", unit: "New HSK 3" },
+        { hanzi: "东方", pinyin: "dōngfāng", arti: "timur / dunia Timur", unit: "New HSK 3" },
+        { hanzi: "冬天", pinyin: "dōngtiān", arti: "musim dingin", unit: "New HSK 3" },
+        { hanzi: "动物园", pinyin: "dòngwùyuán", arti: "kebun binatang", unit: "New HSK 3" },
+        { hanzi: "动", pinyin: "dòng", arti: "bergerak", unit: "New HSK 3" },
+        { hanzi: "懂得", pinyin: "dǒngde", arti: "memahami / mengerti", unit: "New HSK 3" },
+        { hanzi: "读书", pinyin: "dúshū", arti: "membaca buku / belajar", unit: "New HSK 3" },
+        { hanzi: "短裤", pinyin: "duǎnkù", arti: "celana pendek", unit: "New HSK 3" },
+        { hanzi: "对话", pinyin: "duìhuà", arti: "dialog / percakapan", unit: "New HSK 3" },
+        { hanzi: "的话", pinyin: "dehuà", arti: "jika / kalau (di akhir kalimat)", unit: "New HSK 3" },
+        { hanzi: "耳机", pinyin: "ěrjī", arti: "earphone / headphone", unit: "New HSK 3" },
+        { hanzi: "法国", pinyin: "Fǎguó", arti: "Prancis", unit: "New HSK 3" },
+        { hanzi: "发生", pinyin: "fāshēng", arti: "terjadi", unit: "New HSK 3" },
+        { hanzi: "发展", pinyin: "fāzhǎn", arti: "berkembang / perkembangan", unit: "New HSK 3" },
+        { hanzi: "饭", pinyin: "fàn", arti: "nasi / makanan", unit: "New HSK 3" },
+        { hanzi: "饭馆", pinyin: "fànguǎn", arti: "rumah makan / restoran", unit: "New HSK 3" },
+        { hanzi: "方便面", pinyin: "fāngbiànmiàn", arti: "mi instan", unit: "New HSK 3" },
+        { hanzi: "方法", pinyin: "fāngfǎ", arti: "metode / cara", unit: "New HSK 3" },
+        { hanzi: "方向", pinyin: "fāngxiàng", arti: "arah", unit: "New HSK 3" },
+        { hanzi: "房子", pinyin: "fángzi", arti: "rumah / bangunan", unit: "New HSK 3" },
+        { hanzi: "放假", pinyin: "fàngjià", arti: "libur (sekolah/kerja)", unit: "New HSK 3" },
+        { hanzi: "放学", pinyin: "fàngxué", arti: "pulang sekolah", unit: "New HSK 3" },
+        { hanzi: "飞", pinyin: "fēi", arti: "terbang", unit: "New HSK 3" },
+        { hanzi: "分开", pinyin: "fēnkāi", arti: "berpisah / memisahkan", unit: "New HSK 3" },
+        { hanzi: "风", pinyin: "fēng", arti: "angin", unit: "New HSK 3" },
+        { hanzi: "封", pinyin: "fēng", arti: "kata satuan untuk surat", unit: "New HSK 3" },
+        { hanzi: "服务", pinyin: "fúwù", arti: "layanan / melayani", unit: "New HSK 3" },
+        { hanzi: "服务台", pinyin: "fúwùtái", arti: "meja informasi / layanan", unit: "New HSK 3" },
+        { hanzi: "夫妻", pinyin: "fūqī", arti: "suami istri", unit: "New HSK 3" },
+        { hanzi: "该", pinyin: "gāi", arti: "seharusnya", unit: "New HSK 3" },
+        { hanzi: "干", pinyin: "gàn / gān", arti: "melakukan / kering", unit: "New HSK 3" },
+        { hanzi: "刚", pinyin: "gāng", arti: "baru saja", unit: "New HSK 3" },
+        { hanzi: "刚刚", pinyin: "gānggāng", arti: "baru saja", unit: "New HSK 3" },
+        { hanzi: "感到", pinyin: "gǎndào", arti: "merasa", unit: "New HSK 3" },
+        { hanzi: "高中", pinyin: "gāozhōng", arti: "SMA", unit: "New HSK 3" },
+        { hanzi: "歌", pinyin: "gē", arti: "lagu", unit: "New HSK 3" },
+        { hanzi: "公交车", pinyin: "gōngjiāochē", arti: "bus umum", unit: "New HSK 3" },
+        { hanzi: "工作日", pinyin: "gōngzuòrì", arti: "hari kerja", unit: "New HSK 3" },
+        { hanzi: "关机", pinyin: "guānjī", arti: "mematikan mesin/ponsel", unit: "New HSK 3" },
+        { hanzi: "关注", pinyin: "guānzhù", arti: "memperhatikan / mengikuti", unit: "New HSK 3" },
+        { hanzi: "刮", pinyin: "guā", arti: "bertiup (angin) / mengikis", unit: "New HSK 3" },
+        { hanzi: "国", pinyin: "guó", arti: "negara", unit: "New HSK 3" },
+        { hanzi: "国宝", pinyin: "guóbǎo", arti: "harta nasional", unit: "New HSK 3" },
+        { hanzi: "过节", pinyin: "guòjié", arti: "merayakan hari raya", unit: "New HSK 3" },
+        { hanzi: "过年", pinyin: "guònián", arti: "merayakan Tahun Baru", unit: "New HSK 3" },
+        { hanzi: "哈哈", pinyin: "hāhā", arti: "haha (tertawa)", unit: "New HSK 3" },
+        { hanzi: "海", pinyin: "hǎi", arti: "laut", unit: "New HSK 3" },
+        { hanzi: "汉字", pinyin: "Hànzì", arti: "aksara Han", unit: "New HSK 3" },
+        { hanzi: "好久", pinyin: "hǎojiǔ", arti: "sudah lama", unit: "New HSK 3" },
+        { hanzi: "好看", pinyin: "hǎokàn", arti: "bagus / enak dilihat / cantik", unit: "New HSK 3" },
+        { hanzi: "好听", pinyin: "hǎotīng", arti: "merdu / enak didengar", unit: "New HSK 3" },
+        { hanzi: "好玩儿", pinyin: "hǎowánr", arti: "menyenangkan / seru", unit: "New HSK 3" },
+        { hanzi: "好像", pinyin: "hǎoxiàng", arti: "sepertinya / mirip", unit: "New HSK 3" },
+        { hanzi: "好多", pinyin: "hǎoduō", arti: "banyak sekali", unit: "New HSK 3" },
+        { hanzi: "号码", pinyin: "hàomǎ", arti: "nomor", unit: "New HSK 3" },
+        { hanzi: "河", pinyin: "hé", arti: "sungai", unit: "New HSK 3" },
+        { hanzi: "黑色", pinyin: "hēisè", arti: "warna hitam", unit: "New HSK 3" },
+        { hanzi: "合适", pinyin: "héshì", arti: "cocok / sesuai", unit: "New HSK 3" },
+        { hanzi: "红绿灯", pinyin: "hónglǜdēng", arti: "lampu lalu lintas", unit: "New HSK 3" },
+        { hanzi: "红色", pinyin: "hóngsè", arti: "warna merah", unit: "New HSK 3" },
+        { hanzi: "后", pinyin: "hòu", arti: "belakang / setelah", unit: "New HSK 3" },
+        { hanzi: "后年", pinyin: "hòunián", arti: "dua tahun lagi", unit: "New HSK 3" },
+        { hanzi: "后天", pinyin: "hòutiān", arti: "lusa", unit: "New HSK 3" },
+        { hanzi: "花", pinyin: "huā", arti: "bunga / menghabiskan (di DOCX dipisah berdasarkan jenis kata)", unit: "New HSK 3" },
+        { hanzi: "花园", pinyin: "huāyuán", arti: "taman bunga", unit: "New HSK 3" },
+        { hanzi: "画笔", pinyin: "huàbǐ", arti: "kuas lukis / pensil warna", unit: "New HSK 3" },
+        { hanzi: "画家", pinyin: "huàjiā", arti: "pelukis", unit: "New HSK 3" },
+        { hanzi: "黄色", pinyin: "huángsè", arti: "warna kuning", unit: "New HSK 3" },
+        { hanzi: "回来", pinyin: "huílái", arti: "kembali (ke sini)", unit: "New HSK 3" },
+        { hanzi: "回去", pinyin: "huíqù", arti: "kembali (ke sana)", unit: "New HSK 3" },
+        { hanzi: "或", pinyin: "huò", arti: "atau", unit: "New HSK 3" },
+        { hanzi: "火车", pinyin: "huǒchē", arti: "kereta api", unit: "New HSK 3" },
+        { hanzi: "机票", pinyin: "jīpiào", arti: "tiket pesawat", unit: "New HSK 3" },
+        { hanzi: "急", pinyin: "jí", arti: "terburu-buru / cemas", unit: "New HSK 3" },
+        { hanzi: "记", pinyin: "jì", arti: "mencatat / mengingat", unit: "New HSK 3" },
+        { hanzi: "继续", pinyin: "jìxù", arti: "melanjutkan", unit: "New HSK 3" },
+        { hanzi: "加", pinyin: "jiā", arti: "menambah", unit: "New HSK 3" },
+        { hanzi: "家人", pinyin: "jiārén", arti: "anggota keluarga", unit: "New HSK 3" },
+        { hanzi: "假期", pinyin: "jiàqī", arti: "masa liburan", unit: "New HSK 3" },
+        { hanzi: "间", pinyin: "jiān", arti: "kata satuan untuk ruangan", unit: "New HSK 3" },
+        { hanzi: "坚持", pinyin: "jiānchí", arti: "bertahan / gigih", unit: "New HSK 3" },
+        { hanzi: "检票", pinyin: "jiǎnpiào", arti: "memeriksa tiket", unit: "New HSK 3" },
+        { hanzi: "见", pinyin: "jiàn", arti: "bertemu / melihat", unit: "New HSK 3" },
+        { hanzi: "饺子", pinyin: "jiǎozi", arti: "pangsit (jiaozi)", unit: "New HSK 3" },
+        { hanzi: "节", pinyin: "jié", arti: "festival / bagian / kata satuan pelajaran", unit: "New HSK 3" },
+        { hanzi: "街", pinyin: "jiē", arti: "jalan", unit: "New HSK 3" },
+        { hanzi: "斤", pinyin: "jīn", arti: "kati (satuan berat 500 gram)", unit: "New HSK 3" },
+        { hanzi: "今年", pinyin: "jīnnián", arti: "tahun ini", unit: "New HSK 3" },
+        { hanzi: "进来", pinyin: "jìnlái", arti: "masuk (ke sini)", unit: "New HSK 3" },
+        { hanzi: "进去", pinyin: "jìnqù", arti: "masuk (ke sana)", unit: "New HSK 3" },
+        { hanzi: "紧张", pinyin: "jǐnzhāng", arti: "gugup / tegang", unit: "New HSK 3" },
+        { hanzi: "景点", pinyin: "jǐngdiǎn", arti: "tempat wisata", unit: "New HSK 3" },
+        { hanzi: "酒", pinyin: "jiǔ", arti: "minuman keras / arak", unit: "New HSK 3" },
+        { hanzi: "酒店", pinyin: "jiǔdiàn", arti: "hotel", unit: "New HSK 3" },
+        { hanzi: "句", pinyin: "jù", arti: "kalimat / kata satuan kalimat", unit: "New HSK 3" },
+        { hanzi: "卡", pinyin: "kǎ", arti: "kartu", unit: "New HSK 3" },
+        { hanzi: "开花", pinyin: "kāihuā", arti: "berbunga", unit: "New HSK 3" },
+        { hanzi: "开车", pinyin: "kāichē", arti: "menyetir mobil", unit: "New HSK 3" },
+        { hanzi: "开会", pinyin: "kāihuì", arti: "mengadakan rapat", unit: "New HSK 3" },
+        { hanzi: "开机", pinyin: "kāijī", arti: "menyalakan mesin/ponsel", unit: "New HSK 3" },
+        { hanzi: "开学", pinyin: "kāixué", arti: "mulai masuk sekolah (semester baru)", unit: "New HSK 3" },
+        { hanzi: "开心", pinyin: "kāixīn", arti: "senang / gembira", unit: "New HSK 3" },
+        { hanzi: "看病", pinyin: "kànbìng", arti: "berobat / periksa ke dokter", unit: "New HSK 3" },
+        { hanzi: "看来", pinyin: "kànlái", arti: "tampaknya / kelihatannya", unit: "New HSK 3" },
+        { hanzi: "考", pinyin: "kǎo", arti: "menguji / mengikuti ujian", unit: "New HSK 3" },
+        { hanzi: "可", pinyin: "kě", arti: "tetapi / sangat", unit: "New HSK 3" },
+        { hanzi: "可是", pinyin: "kěshì", arti: "tetapi", unit: "New HSK 3" },
+        { hanzi: "客气", pinyin: "kèqi", arti: "sungkan / sopan", unit: "New HSK 3" },
+        { hanzi: "快要", pinyin: "kuàiyào", arti: "akan segera", unit: "New HSK 3" },
+        { hanzi: "矿泉水", pinyin: "kuàngquánshuǐ", arti: "air mineral", unit: "New HSK 3" },
+        { hanzi: "来自", pinyin: "láizì", arti: "berasal dari", unit: "New HSK 3" },
+        { hanzi: "老人", pinyin: "lǎorén", arti: "orang tua / lansia", unit: "New HSK 3" },
+        { hanzi: "练", pinyin: "liàn", arti: "berlatih", unit: "New HSK 3" },
+        { hanzi: "联欢", pinyin: "liánhuān", arti: "pesta bersama / ramah tamah", unit: "New HSK 3" },
+        { hanzi: "凉快", pinyin: "liángkuai", arti: "sejuk", unit: "New HSK 3" },
+        { hanzi: "聊", pinyin: "liáo", arti: "mengobrol", unit: "New HSK 3" },
+        { hanzi: "里面", pinyin: "lǐmiàn", arti: "di dalam", unit: "New HSK 3" },
+        { hanzi: "留学生", pinyin: "liúxuéshēng", arti: "mahasiswa asing", unit: "New HSK 3" },
+        { hanzi: "路口", pinyin: "lùkǒu", arti: "persimpangan jalan", unit: "New HSK 3" },
+        { hanzi: "路上", pinyin: "lùshang", arti: "di jalan", unit: "New HSK 3" },
+        { hanzi: "绿色", pinyin: "lǜsè", arti: "warna hijau", unit: "New HSK 3" },
+        { hanzi: "毛", pinyin: "máo", arti: "satuan uang (1/10 yuan) / bulu", unit: "New HSK 3" },
+        { hanzi: "没", pinyin: "méi", arti: "tidak / belum", unit: "New HSK 3" },
+        { hanzi: "没事", pinyin: "méishì", arti: "tidak apa-apa", unit: "New HSK 3" },
+        { hanzi: "没意思", pinyin: "méiyìsi", arti: "membosankan / tidak menarik", unit: "New HSK 3" },
+        { hanzi: "门口", pinyin: "ménkǒu", arti: "pintu masuk / depan pintu", unit: "New HSK 3" },
+        { hanzi: "门票", pinyin: "ménpiào", arti: "tiket masuk", unit: "New HSK 3" },
+        { hanzi: "们", pinyin: "men", arti: "akhiran jamak untuk manusia", unit: "New HSK 3" },
+        { hanzi: "面", pinyin: "miàn", arti: "permukaan / mi", unit: "New HSK 3" },
+        { hanzi: "面前", pinyin: "miànqián", arti: "di hadapan / di depan", unit: "New HSK 3" },
+        { hanzi: "名", pinyin: "míng", arti: "nama / kata satuan orang", unit: "New HSK 3" },
+        { hanzi: "名人", pinyin: "míngrén", arti: "orang terkenal / selebritas", unit: "New HSK 3" },
+        { hanzi: "明年", pinyin: "míngnián", arti: "tahun depan", unit: "New HSK 3" },
+        { hanzi: "目标", pinyin: "mùbiāo", arti: "target / tujuan", unit: "New HSK 3" },
+        { hanzi: "那里", pinyin: "nàlǐ", arti: "di sana", unit: "New HSK 3" },
+        { hanzi: "那儿", pinyin: "nàr", arti: "di sana", unit: "New HSK 3" },
+        { hanzi: "那个", pinyin: "nàge", arti: "itu", unit: "New HSK 3" },
+        { hanzi: "哪些", pinyin: "nǎxiē", arti: "yang mana saja", unit: "New HSK 3" },
+        { hanzi: "哪个", pinyin: "nǎge", arti: "yang mana", unit: "New HSK 3" },
+        { hanzi: "哪里", pinyin: "nǎlǐ", arti: "di mana", unit: "New HSK 3" },
+        { hanzi: "那边", pinyin: "nàbiān", arti: "sebelah sana", unit: "New HSK 3" },
+        { hanzi: "那么", pinyin: "nàme", arti: "begitu / kalau begitu", unit: "New HSK 3" },
+        { hanzi: "那样", pinyin: "nàyàng", arti: "seperti itu", unit: "New HSK 3" },
+        { hanzi: "奶茶", pinyin: "nǎichá", arti: "teh susu (milk tea)", unit: "New HSK 3" },
+        { hanzi: "男孩儿", pinyin: "nánháir", arti: "anak laki-laki", unit: "New HSK 3" },
+        { hanzi: "男生", pinyin: "nánshēng", arti: "siswa laki-laki / cowok", unit: "New HSK 3" },
+        { hanzi: "南方", pinyin: "nánfāng", arti: "bagian selatan", unit: "New HSK 3" },
+        { hanzi: "南京", pinyin: "Nánjīng", arti: "Nanjing", unit: "New HSK 3" },
+        { hanzi: "难看", pinyin: "nánkàn", arti: "jelek / tidak enak dilihat", unit: "New HSK 3" },
+        { hanzi: "难题", pinyin: "nántí", arti: "soal sulit / masalah sulit", unit: "New HSK 3" },
+        { hanzi: "牛", pinyin: "niú", arti: "sapi", unit: "New HSK 3" },
+        { hanzi: "女孩儿", pinyin: "nǚháir", arti: "anak perempuan", unit: "New HSK 3" },
+        { hanzi: "女朋友", pinyin: "nǚpéngyou", arti: "pacar perempuan", unit: "New HSK 3" },
+        { hanzi: "女生", pinyin: "nǚshēng", arti: "siswa perempuan / cewek", unit: "New HSK 3" },
+        { hanzi: "女士", pinyin: "nǚshì", arti: "nyonya / ibu / wanita", unit: "New HSK 3" },
+        { hanzi: "怕", pinyin: "pà", arti: "takut", unit: "New HSK 3" },
+        { hanzi: "拍照", pinyin: "pāizhào", arti: "memotret / berfoto", unit: "New HSK 3" },
+        { hanzi: "跑", pinyin: "pǎo", arti: "berlari", unit: "New HSK 3" },
+        { hanzi: "平时", pinyin: "píngshí", arti: "hari-hari biasa", unit: "New HSK 3" },
+        { hanzi: "前", pinyin: "qián", arti: "depan / sebelum", unit: "New HSK 3" },
+        { hanzi: "前边", pinyin: "qiánbiān", arti: "sebelah depan", unit: "New HSK 3" },
+        { hanzi: "前天", pinyin: "qiántiān", arti: "kemarin lusa", unit: "New HSK 3" },
+        { hanzi: "起", pinyin: "qǐ", arti: "bangun / bangkit", unit: "New HSK 3" },
+        { hanzi: "请问", pinyin: "qǐngwèn", arti: "permisi mau tanya", unit: "New HSK 3" },
+        { hanzi: "请客", pinyin: "qǐngkè", arti: "mentraktir", unit: "New HSK 3" },
+        { hanzi: "球", pinyin: "qiú", arti: "bola", unit: "New HSK 3" },
+        { hanzi: "球场", pinyin: "qiúchǎng", arti: "lapangan bola", unit: "New HSK 3" },
+        { hanzi: "秋天", pinyin: "qiūtiān", arti: "musim gugur", unit: "New HSK 3" },
+        { hanzi: "全", pinyin: "quán", arti: "seluruh / lengkap", unit: "New HSK 3" },
+        { hanzi: "肉", pinyin: "ròu", arti: "daging", unit: "New HSK 3" },
+        { hanzi: "山", pinyin: "shān", arti: "gunung", unit: "New HSK 3" },
+        { hanzi: "商场", pinyin: "shāngchǎng", arti: "mal / pusat perbelanjaan", unit: "New HSK 3" },
+        { hanzi: "上来", pinyin: "shànglái", arti: "naik (ke sini)", unit: "New HSK 3" },
+        { hanzi: "上面", pinyin: "shàngmiàn", arti: "di atas", unit: "New HSK 3" },
+        { hanzi: "上去", pinyin: "shàngqù", arti: "naik (ke sana)", unit: "New HSK 3" },
+        { hanzi: "上课", pinyin: "shàngkè", arti: "mulai pelajaran / masuk kelas", unit: "New HSK 3" },
+        { hanzi: "上学", pinyin: "shàngxué", arti: "bersekolah / berangkat sekolah", unit: "New HSK 3" },
+        { hanzi: "勺子", pinyin: "sháozi", arti: "sendok", unit: "New HSK 3" },
+        { hanzi: "身边", pinyin: "shēnbiān", arti: "di sisi / di samping seseorang", unit: "New HSK 3" },
+        { hanzi: "身高", pinyin: "shēngāo", arti: "tinggi badan", unit: "New HSK 3" },
+        { hanzi: "生活", pinyin: "shēnghuó", arti: "kehidupan / hidup", unit: "New HSK 3" },
+        { hanzi: "声", pinyin: "shēng", arti: "suara / nada", unit: "New HSK 3" },
+        { hanzi: "时", pinyin: "shí", arti: "waktu / saat", unit: "New HSK 3" },
+        { hanzi: "室", pinyin: "shì", arti: "ruangan", unit: "New HSK 3" },
+        { hanzi: "收", pinyin: "shōu", arti: "menerima / mengumpulkan", unit: "New HSK 3" },
+        { hanzi: "收到", pinyin: "shōudào", arti: "menerima", unit: "New HSK 3" },
+        { hanzi: "手", pinyin: "shǒu", arti: "tangan", unit: "New HSK 3" },
+        { hanzi: "售货员", pinyin: "shòuhuòyuán", arti: "pramuniaga / penjaga toko", unit: "New HSK 3" },
+        { hanzi: "书", pinyin: "shū", arti: "buku", unit: "New HSK 3" },
+        { hanzi: "书包", pinyin: "shūbāo", arti: "tas sekolah", unit: "New HSK 3" },
+        { hanzi: "书店", pinyin: "shūdiàn", arti: "toko buku", unit: "New HSK 3" },
+        { hanzi: "受到", pinyin: "shòudào", arti: "menerima / mendapatkan", unit: "New HSK 3" },
+        { hanzi: "树", pinyin: "shù", arti: "pohon", unit: "New HSK 3" },
+        { hanzi: "刷", pinyin: "shuā", arti: "menyikat / menggesek (kartu)", unit: "New HSK 3" },
+        { hanzi: "睡", pinyin: "shuì", arti: "tidur", unit: "New HSK 3" },
+        { hanzi: "四季", pinyin: "sìjì", arti: "empat musim", unit: "New HSK 3" },
+        { hanzi: "它们", pinyin: "tāmen", arti: "mereka (benda/hewan)", unit: "New HSK 3" },
+        { hanzi: "他们", pinyin: "tāmen", arti: "mereka (laki-laki/campuran)", unit: "New HSK 3" },
+        { hanzi: "她们", pinyin: "tāmen", arti: "mereka (perempuan)", unit: "New HSK 3" },
+        { hanzi: "泰国", pinyin: "Tàiguó", arti: "Thailand", unit: "New HSK 3" },
+        { hanzi: "天", pinyin: "tiān", arti: "hari / langit", unit: "New HSK 3" },
+        { hanzi: "踢", pinyin: "tī", arti: "menendang", unit: "New HSK 3" },
+        { hanzi: "跳", pinyin: "tiào", arti: "melompat / menari", unit: "New HSK 3" },
+        { hanzi: "听见", pinyin: "tīngjiàn", arti: "mendengar", unit: "New HSK 3" },
+        { hanzi: "听说", pinyin: "tīngshuō", arti: "katanya / mendengar kabar", unit: "New HSK 3" },
+        { hanzi: "挺", pinyin: "tǐng", arti: "sangat / cukup", unit: "New HSK 3" },
+        { hanzi: "头", pinyin: "tóu", arti: "kepala", unit: "New HSK 3" },
+        { hanzi: "外边", pinyin: "wàibiān", arti: "sebelah luar", unit: "New HSK 3" },
+        { hanzi: "外地", pinyin: "wàidì", arti: "luar daerah / luar kota", unit: "New HSK 3" },
+        { hanzi: "外国", pinyin: "wàiguó", arti: "luar negeri", unit: "New HSK 3" },
+        { hanzi: "外卖", pinyin: "wàimài", arti: "pesan antar makanan", unit: "New HSK 3" },
+        { hanzi: "外面", pinyin: "wàimiàn", arti: "di luar", unit: "New HSK 3" },
+        { hanzi: "外语", pinyin: "wàiyǔ", arti: "bahasa asing", unit: "New HSK 3" },
+        { hanzi: "晚", pinyin: "wǎn", arti: "malam / terlambat", unit: "New HSK 3" },
+        { hanzi: "晚点", pinyin: "wǎndiǎn", arti: "terlambat (jadwal transportasi)", unit: "New HSK 3" },
+        { hanzi: "晚饭", pinyin: "wǎnfàn", arti: "makan malam", unit: "New HSK 3" },
+        { hanzi: "晚会", pinyin: "wǎnhuì", arti: "pesta malam / acara malam", unit: "New HSK 3" },
+        { hanzi: "网上", pinyin: "wǎngshàng", arti: "di internet / online", unit: "New HSK 3" },
+        { hanzi: "网站", pinyin: "wǎngzhàn", arti: "situs web (website)", unit: "New HSK 3" },
+        { hanzi: "忘", pinyin: "wàng", arti: "lupa", unit: "New HSK 3" },
+        { hanzi: "卫生间", pinyin: "wèishēngjiān", arti: "toilet / kamar mandi", unit: "New HSK 3" },
+        { hanzi: "屋子", pinyin: "wūzi", arti: "kamar / ruangan", unit: "New HSK 3" },
+        { hanzi: "午饭", pinyin: "wǔfàn", arti: "makan siang", unit: "New HSK 3" },
+        { hanzi: "西北", pinyin: "xīběi", arti: "barat laut", unit: "New HSK 3" },
+        { hanzi: "西安", pinyin: "Xī'ān", arti: "Xi'an", unit: "New HSK 3" },
+        { hanzi: "西安饭店", pinyin: "Xī'ān Fàndiàn", arti: "Restoran Xi'an", unit: "New HSK 3" },
+        { hanzi: "喜爱", pinyin: "xǐ'ài", arti: "menyukai / menggemari", unit: "New HSK 3" },
+        { hanzi: "洗衣机", pinyin: "xǐyījī", arti: "mesin cuci", unit: "New HSK 3" },
+        { hanzi: "下班", pinyin: "xiàbān", arti: "pulang kerja", unit: "New HSK 3" },
+        { hanzi: "下课", pinyin: "xiàkè", arti: "selesai pelajaran / bubar kelas", unit: "New HSK 3" },
+        { hanzi: "下来", pinyin: "xiàlái", arti: "turun (ke sini)", unit: "New HSK 3" },
+        { hanzi: "下面", pinyin: "xiàmiàn", arti: "di bawah", unit: "New HSK 3" },
+        { hanzi: "下去", pinyin: "xiàqù", arti: "turun (ke sana)", unit: "New HSK 3" },
+        { hanzi: "夏天", pinyin: "xiàtiān", arti: "musim panas", unit: "New HSK 3" },
+        { hanzi: "箱子", pinyin: "xiāngzi", arti: "kotak / koper", unit: "New HSK 3" },
+        { hanzi: "相机", pinyin: "xiàngjī", arti: "kamera", unit: "New HSK 3" },
+        { hanzi: "小孩儿", pinyin: "xiǎoháir", arti: "anak kecil", unit: "New HSK 3" },
+        { hanzi: "小朋友", pinyin: "xiǎopéngyou", arti: "anak kecil (sapaan akrab)", unit: "New HSK 3" },
+        { hanzi: "小时候", pinyin: "xiǎoshíhou", arti: "masa kecil", unit: "New HSK 3" },
+        { hanzi: "小学", pinyin: "xiǎoxué", arti: "SD", unit: "New HSK 3" },
+        { hanzi: "小学生", pinyin: "xiǎoxuéshēng", arti: "siswa SD", unit: "New HSK 3" },
+        { hanzi: "小区", pinyin: "xiǎoqū", arti: "kompleks perumahan", unit: "New HSK 3" },
+        { hanzi: "鞋", pinyin: "xié", arti: "sepatu", unit: "New HSK 3" },
+        { hanzi: "心里", pinyin: "xīnlǐ", arti: "di dalam hati", unit: "New HSK 3" },
+        { hanzi: "新年", pinyin: "xīnnián", arti: "tahun baru", unit: "New HSK 3" },
+        { hanzi: "星期日", pinyin: "Xīngqīrì", arti: "hari Minggu", unit: "New HSK 3" },
+        { hanzi: "星期天", pinyin: "Xīngqītiān", arti: "hari Minggu", unit: "New HSK 3" },
+        { hanzi: "行", pinyin: "xíng", arti: "boleh / oke / berjalan", unit: "New HSK 3" },
+        { hanzi: "行李", pinyin: "xíngli", arti: "bagasi / barang bawaan", unit: "New HSK 3" },
+        { hanzi: "兴趣", pinyin: "xìngqù", arti: "minat / ketertarikan", unit: "New HSK 3" },
+        { hanzi: "姓名", pinyin: "xìngmíng", arti: "nama lengkap", unit: "New HSK 3" },
+        { hanzi: "休假", pinyin: "xiūjià", arti: "mengambil cuti / berlibur", unit: "New HSK 3" },
+        { hanzi: "学", pinyin: "xué", arti: "belajar", unit: "New HSK 3" },
+        { hanzi: "学期", pinyin: "xuéqī", arti: "semester", unit: "New HSK 3" },
+        { hanzi: "选", pinyin: "xuǎn", arti: "memilih", unit: "New HSK 3" },
+        { hanzi: "羊", pinyin: "yáng", arti: "kambing / domba", unit: "New HSK 3" },
+        { hanzi: "养", pinyin: "yǎng", arti: "memelihara / merawat", unit: "New HSK 3" },
+        { hanzi: "药店", pinyin: "yàodiàn", arti: "apotek", unit: "New HSK 3" },
+        { hanzi: "叶子", pinyin: "yèzi", arti: "daun", unit: "New HSK 3" },
+        { hanzi: "页", pinyin: "yè", arti: "halaman", unit: "New HSK 3" },
+        { hanzi: "医", pinyin: "yī", arti: "ilmu kedokteran / medis", unit: "New HSK 3" },
+        { hanzi: "颐和园", pinyin: "Yíhéyuán", arti: "Istana Musim Panas (Summer Palace)", unit: "New HSK 3" },
+        { hanzi: "以上", pinyin: "yǐshàng", arti: "ke atas / di atas", unit: "New HSK 3" },
+        { hanzi: "以为", pinyin: "yǐwéi", arti: "mengira", unit: "New HSK 3" },
+        { hanzi: "一些", pinyin: "yīxiē", arti: "beberapa", unit: "New HSK 3" },
+        { hanzi: "一块儿", pinyin: "yīkuàir", arti: "bersama-sama", unit: "New HSK 3" },
+        { hanzi: "英国", pinyin: "Yīngguó", arti: "Inggris", unit: "New HSK 3" },
+        { hanzi: "用鸡", pinyin: "yòngjī", arti: "(kemungkinan salah ketik di TXT dari 用餐 / 拥挤)", unit: "New HSK 3" },
+        { hanzi: "游", pinyin: "yóu", arti: "berenang", unit: "New HSK 3" },
+        { hanzi: "游客", pinyin: "yóukè", arti: "turis / wisatawan", unit: "New HSK 3" },
+        { hanzi: "有点儿", pinyin: "yǒudiǎnr", arti: "agak / sedikit", unit: "New HSK 3" },
+        { hanzi: "有关", pinyin: "yǒuguān", arti: "berkaitan / berhubungan", unit: "New HSK 3" },
+        { hanzi: "有时", pinyin: "yǒushí", arti: "kadang-kadang", unit: "New HSK 3" },
+        { hanzi: "有些", pinyin: "yǒuxiē", arti: "beberapa / sebagian", unit: "New HSK 3" },
+        { hanzi: "有意思", pinyin: "yǒuyìsi", arti: "menarik / seru", unit: "New HSK 3" },
+        { hanzi: "有用", pinyin: "yǒuyòng", arti: "berguna / bermanfaat", unit: "New HSK 3" },
+        { hanzi: "有的", pinyin: "yǒude", arti: "ada yang / sebagian", unit: "New HSK 3" },
+        { hanzi: "雨", pinyin: "yǔ", arti: "hujan", unit: "New HSK 3" },
+        { hanzi: "雨衣", pinyin: "yǔyī", arti: "jas hujan", unit: "New HSK 3" },
+        { hanzi: "羽毛球", pinyin: "yǔmáoqiú", arti: "bulu tangkis", unit: "New HSK 3" },
+        { hanzi: "员", pinyin: "yuán", arti: "anggota / petugas", unit: "New HSK 3" },
+        { hanzi: "运动会", pinyin: "yùndònghuì", arti: "pekan olahraga", unit: "New HSK 3" },
+        { hanzi: "运动员", pinyin: "yùndòngyuán", arti: "atlet", unit: "New HSK 3" },
+        { hanzi: "在（正在）", pinyin: "zài (zhèngzài)", arti: "sedang", unit: "New HSK 3" },
+        { hanzi: "咱们", pinyin: "zánmen", arti: "kita (inklusif)", unit: "New HSK 3" },
+        { hanzi: "脏", pinyin: "zāng", arti: "kotor", unit: "New HSK 3" },
+        { hanzi: "早", pinyin: "zǎo", arti: "pagi / awal", unit: "New HSK 3" },
+        { hanzi: "早饭", pinyin: "zǎofàn", arti: "sarapan", unit: "New HSK 3" },
+        { hanzi: "怎样", pinyin: "zěnyàng", arti: "bagaimana", unit: "New HSK 3" },
+        { hanzi: "照", pinyin: "zhào", arti: "memotret / menyinari", unit: "New HSK 3" },
+        { hanzi: "照相", pinyin: "zhàoxiàng", arti: "berfoto / memotret", unit: "New HSK 3" },
+        { hanzi: "这边", pinyin: "zhèbiān", arti: "sebelah sini", unit: "New HSK 3" },
+        { hanzi: "这儿", pinyin: "zhèr", arti: "di sini", unit: "New HSK 3" },
+        { hanzi: "这个", pinyin: "zhège", arti: "ini", unit: "New HSK 3" },
+        { hanzi: "这里", pinyin: "zhèlǐ", arti: "di sini", unit: "New HSK 3" },
+        { hanzi: "这么", pinyin: "zhème", arti: "begini / begitu", unit: "New HSK 3" },
+        { hanzi: "这些", pinyin: "zhèxiē", arti: "ini semua", unit: "New HSK 3" },
+        { hanzi: "这样", pinyin: "zhèyàng", arti: "seperti ini", unit: "New HSK 3" },
+        { hanzi: "真正", pinyin: "zhēnzhèng", arti: "sejati / sungguh-sungguh", unit: "New HSK 3" },
+        { hanzi: "正", pinyin: "zhèng", arti: "sedang / tepat", unit: "New HSK 3" },
+        { hanzi: "直到", pinyin: "zhídào", arti: "sampai / hingga", unit: "New HSK 3" },
+        { hanzi: "只是", pinyin: "zhǐshì", arti: "hanya", unit: "New HSK 3" },
+        { hanzi: "只能", pinyin: "zhǐnéng", arti: "hanya bisa", unit: "New HSK 3" },
+        { hanzi: "只要", pinyin: "zhǐyào", arti: "asalkan", unit: "New HSK 3" },
+        { hanzi: "中学", pinyin: "zhōngxué", arti: "sekolah menengah (SMP/SMA)", unit: "New HSK 3" },
+        { hanzi: "中学生", pinyin: "zhōngxuéshēng", arti: "siswa sekolah menengah", unit: "New HSK 3" },
+        { hanzi: "周", pinyin: "zhōu", arti: "minggu / pekan", unit: "New HSK 3" },
+        { hanzi: "主意", pinyin: "zhǔyi", arti: "ide / gagasan", unit: "New HSK 3" },
+        { hanzi: "住院", pinyin: "zhùyuàn", arti: "dirawat di rumah sakit", unit: "New HSK 3" },
+        { hanzi: "竹子", pinyin: "zhúzi", arti: "bambu", unit: "New HSK 3" },
+        { hanzi: "总", pinyin: "zǒng", arti: "selalu", unit: "New HSK 3" },
+        { hanzi: "走路", pinyin: "zǒulù", arti: "berjalan kaki", unit: "New HSK 3" },
+        { hanzi: "足球", pinyin: "zúqiú", arti: "sepak bola", unit: "New HSK 3" },
+        { hanzi: "最", pinyin: "zuì", arti: "paling", unit: "New HSK 3" },
+        { hanzi: "做饭", pinyin: "zuòfàn", arti: "memasak", unit: "New HSK 3" },
+        { hanzi: "做法", pinyin: "zuòfǎ", arti: "cara membuat / metode", unit: "New HSK 3" },
+        { hanzi: "做客", pinyin: "zuòkè", arti: "bertamu", unit: "New HSK 3" },
+        { hanzi: "最好", pinyin: "zuìhǎo", arti: "sebaiknya / paling baik", unit: "New HSK 3" },
+        { hanzi: "左", pinyin: "zuǒ", arti: "kiri", unit: "New HSK 3" },
+        { hanzi: "右", pinyin: "yòu", arti: "kanan", unit: "New HSK 3" }
+      ];
+
+      // 12 Palet Tema Warna Cerah & Kontras Tinggi
+      const CARD_THEMES = [
+        {
+          frontGrad: "linear-gradient(135deg, #FF5E62 0%, #FF9966 100%)",
+          border: "#FF4D52",
+          backBg: "linear-gradient(145deg, #FFF5F5 0%, #FFE4E6 100%)",
+          accentText: "#E11D48",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#FFF1F2",
+          numText: "#BE123C",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(255, 237, 213, 0.25)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #0284C7 0%, #38BDF8 100%)",
+          border: "#0369A1",
+          backBg: "linear-gradient(145deg, #F0F9FF 0%, #E0F2FE 100%)",
+          accentText: "#0369A1",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#F0F9FF",
+          numText: "#0369A1",
+          orb1: "rgba(255, 255, 255, 0.24)",
+          orb2: "rgba(186, 230, 253, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #059669 0%, #34D399 100%)",
+          border: "#047857",
+          backBg: "linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 100%)",
+          accentText: "#047857",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#ECFDF5",
+          numText: "#065F46",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(167, 243, 208, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)",
+          border: "#6D28D9",
+          backBg: "linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%)",
+          accentText: "#6D28D9",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#F5F3FF",
+          numText: "#5B21B6",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(221, 214, 254, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #EA580C 0%, #FBBF24 100%)",
+          border: "#C2410C",
+          backBg: "linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)",
+          accentText: "#C2410C",
+          badgeBg: "rgba(255,255,255,0.25)",
+          numBg: "#FFFBEB",
+          numText: "#9A3412",
+          orb1: "rgba(255, 255, 255, 0.24)",
+          orb2: "rgba(254, 240, 138, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #DB2777 0%, #F472B6 100%)",
+          border: "#BE185D",
+          backBg: "linear-gradient(145deg, #FDF2F8 0%, #FCE7F3 100%)",
+          accentText: "#BE185D",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#FDF2F8",
+          numText: "#9D174D",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(251, 207, 232, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #0891B2 0%, #2DD4BF 100%)",
+          border: "#0E7490",
+          backBg: "linear-gradient(145deg, #ECFEFF 0%, #CCFBF1 100%)",
+          accentText: "#0F766E",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#ECFEFF",
+          numText: "#115E59",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(153, 246, 228, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #4338CA 0%, #6366F1 100%)",
+          border: "#3730A3",
+          backBg: "linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 100%)",
+          accentText: "#4338CA",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#EEF2FF",
+          numText: "#312E81",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(199, 210, 254, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #D97706 0%, #F59E0B 100%)",
+          border: "#B45309",
+          backBg: "linear-gradient(145deg, #FFFBEB 0%, #FDE68A 100%)",
+          accentText: "#B45309",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#FFFBEB",
+          numText: "#78350F",
+          orb1: "rgba(255, 255, 255, 0.24)",
+          orb2: "rgba(253, 230, 138, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #E11D48 0%, #FB7185 100%)",
+          border: "#BE123C",
+          backBg: "linear-gradient(145deg, #FFF1F2 0%, #FFE4E6 100%)",
+          accentText: "#BE123C",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#FFF1F2",
+          numText: "#881337",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(254, 205, 211, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #4D7C0F 0%, #84CC16 100%)",
+          border: "#3F6212",
+          backBg: "linear-gradient(145deg, #F7FEE7 0%, #ECFCCB 100%)",
+          accentText: "#3F6212",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#F7FEE7",
+          numText: "#365314",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(217, 249, 157, 0.28)"
+        },
+        {
+          frontGrad: "linear-gradient(135deg, #A21CAF 0%, #E879F9 100%)",
+          border: "#86198F",
+          backBg: "linear-gradient(145deg, #FDF4FF 0%, #FAE8FF 100%)",
+          accentText: "#86198F",
+          badgeBg: "rgba(255,255,255,0.24)",
+          numBg: "#FDF4FF",
+          numText: "#701A75",
+          orb1: "rgba(255, 255, 255, 0.22)",
+          orb2: "rgba(245, 208, 254, 0.28)"
+        }
+      ];
+
+      // Pengacakan Fisher-Yates (Otomatis dijalankan saat mulai baru & selesai)
+      function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      // Efek Suara Lembut Web Audio API
+      let audioCtx = null;
+      function playTone(type) {
+        try {
+          if (!audioCtx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) audioCtx = new AudioCtx();
+          }
+          if (!audioCtx) return;
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          if (type === 'flip') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.06);
+            osc.frequency.setValueAtTime(783.99, now + 0.12);
+            gain.gain.setValueAtTime(0.11, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc.start(now);
+            osc.stop(now + 0.29);
+          } else if (type === 'nav') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(587.33, now + 0.06);
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            osc.start(now);
+            osc.stop(now + 0.19);
+          } else if (type === 'complete') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.1);
+            osc.frequency.setValueAtTime(783.99, now + 0.2);
+            osc.frequency.setValueAtTime(1046.5, now + 0.3);
+            gain.gain.setValueAtTime(0.14, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+            osc.start(now);
+            osc.stop(now + 0.62);
+          }
+        } catch (err) {
+          // Abaikan jika audio dibatasi browser
+        }
+      }
+
+      // Efek Partikel Bintang / Konfeti
+      function spawnSparkles(containerEl, count = 12) {
+        const symbols = ['✨', '⭐', '🌟', '💫', '🎉', '🎊'];
+        for (let i = 0; i < count; i++) {
+          const sp = document.createElement('span');
+          sp.className = 'sparkle-particle notranslate';
+          sp.setAttribute('translate', 'no');
+          sp.textContent = symbols[i % symbols.length];
+
+          const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.35 - 0.175);
+          const dist = 100 + Math.random() * 100;
+          const tx = Math.cos(angle) * dist + 'px';
+          const ty = Math.sin(angle) * dist + 'px';
+
+          sp.style.left = '50%';
+          sp.style.top = '50%';
+          sp.style.setProperty('--tx', tx);
+          sp.style.setProperty('--ty', ty);
+
+          containerEl.appendChild(sp);
+          setTimeout(() => {
+            if (sp.parentNode) sp.parentNode.removeChild(sp);
+          }, 860);
+        }
+      }
+
+      // State Aplikasi
+      let currentDeck = shuffleArray(VOCAB_LIST);
+      let currentIndex = 0;
+      let isFlipped = false;
+      let isCompleted = false;
+      let roundCount = 1;
+      let isTransitioning = false;
+
+      // Elemen DOM
+      const cardStageEl = document.getElementById("cardStage");
+      const roundBadgeEl = document.getElementById("roundBadge");
+      const progressTextEl = document.getElementById("progressText");
+      const progressBarEl = document.getElementById("progressBar");
+      const btnPrevEl = document.getElementById("btnPrev");
+      const btnNextEl = document.getElementById("btnNext");
+      const btnNextLabelEl = document.getElementById("btnNextLabel");
+      const btnNewStartEl = document.getElementById("btnNewStart");
+      const instructionsModalEl = document.getElementById("instructionsModal");
+      const btnOpenInstructionsEl = document.getElementById("btnOpenInstructions");
+      const btnCloseInstructionsEl = document.getElementById("btnCloseInstructions");
+
+      function updateUIControls() {
+        const total = currentDeck.length;
+        roundBadgeEl.textContent = `Putaran ${roundCount}`;
+
+        if (isCompleted) {
+          progressTextEl.textContent = `Selesai (${total}/${total})`;
+          progressBarEl.style.width = "100%";
+          btnPrevEl.disabled = false;
+          btnNextLabelEl.textContent = "Mulai Baru & Acak";
+        } else {
+          progressTextEl.textContent = `${currentIndex + 1} / ${total}`;
+          const pct = ((currentIndex + 1) / total) * 100;
+          progressBarEl.style.width = pct.toFixed(2) + "%";
+          btnPrevEl.disabled = currentIndex === 0;
+          btnNextLabelEl.textContent = currentIndex === total - 1 ? "Selesai" : "Next";
+        }
+      }
+
+      function buildSingleCard(item, index, enterAnimClass) {
+        const theme = CARD_THEMES[index % CARD_THEMES.length];
+        const hanziSizeClass = item.hanzi.length >= 6 ? "hanzi-extra-long" : (item.hanzi.length >= 4 ? "hanzi-long" : "");
+
+        const cardScene = document.createElement("div");
+        cardScene.setAttribute("translate", "no");
+        cardScene.className = `notranslate card-scene cursor-pointer ${enterAnimClass || ""}`;
+
+        cardScene.innerHTML = `
+          <div translate="no" class="notranslate card-inner ${isFlipped ? "is-flipped" : ""}">
+            
+            <!-- ==================== SISI DEPAN (HANZI SUPER BESAR 1 LAYAR PENUH) ==================== -->
+            <div translate="no" class="notranslate card-face card-face-front flex flex-col justify-between p-6 sm:p-10 shadow-2xl"
+                 style="background: ${theme.frontGrad}; border: 4px solid ${theme.border};">
+              
+              <!-- Elemen Animasi Latar Belakang Hidup -->
+              <div class="pointer-events-none absolute -top-12 -right-12 w-56 h-56 rounded-full bubble-1" style="background: ${theme.orb1};"></div>
+              <div class="pointer-events-none absolute -bottom-16 -left-12 w-64 h-64 rounded-full bubble-2" style="background: ${theme.orb2};"></div>
+              <div class="pointer-events-none absolute inset-0 m-auto w-80 h-80 rounded-full blur-3xl aura-pulse" style="background: rgba(255,255,255,0.24);"></div>
+              <div class="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent sheen-glint"></div>
+              <svg class="pointer-events-none absolute bottom-0 left-0 w-[140%] h-24 opacity-20 wave-motion" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,40 C300,110 600,-20 900,50 C1050,85 1150,60 1200,40 L1200,120 L0,120 Z" fill="#ffffff"></path>
+              </svg>
+
+              <!-- Baris Atas: Nomor Urut & Badge Unit -->
+              <div class="relative z-10 flex items-center justify-between gap-3">
+                <span class="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl font-black text-lg sm:text-2xl shadow-md"
+                      style="background: ${theme.numBg}; color: ${theme.numText};">
+                  Kosakata #${index + 1}
+                </span>
+
+                <span translate="no" class="notranslate px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-white font-extrabold text-sm sm:text-lg tracking-wide backdrop-blur-xs border border-white/35 shadow-sm"
+                      style="background: ${theme.badgeBg};">
+                  ${item.unit}
+                </span>
+              </div>
+
+              <!-- Tengah: Huruf Mandarin (Hanzi) FZKai Ukuran Raksasa -->
+              <div class="relative z-10 flex-1 flex items-center justify-center my-2 px-4 text-center">
+                <span translate="no" class="notranslate hanzi-font hanzi-single-main ${hanziSizeClass} text-white select-none">
+                  ${item.hanzi}
+                </span>
+              </div>
+
+              <!-- Bawah: Ajakan Klik untuk Balik Kartu -->
+              <div class="relative z-10 flex justify-center">
+                <span class="inline-flex items-center gap-2 px-5 py-2 sm:py-2.5 rounded-full bg-black/20 text-white text-sm sm:text-lg font-extrabold tracking-wide backdrop-blur-xs border border-white/20">
+                  <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"></path>
+                  </svg>
+                  Klik Kartu untuk Lihat Pinyin &amp; Arti
+                </span>
+              </div>
+            </div>
+
+            <!-- ==================== SISI BELAKANG (PINYIN & ARTI BAHASA INDONESIA) ==================== -->
+            <div translate="no" class="notranslate card-face card-face-back flex flex-col justify-between p-6 sm:p-10 shadow-2xl"
+                 style="background: ${theme.backBg}; border: 5px solid ${theme.border};">
+              
+              <!-- Aura Lembut Sisi Belakang -->
+              <div class="pointer-events-none absolute -top-14 -right-14 w-56 h-56 rounded-full bubble-1 opacity-45" style="background: ${theme.frontGrad}; filter: blur(34px);"></div>
+              <div class="pointer-events-none absolute -bottom-14 -left-14 w-56 h-56 rounded-full bubble-2 opacity-35" style="background: ${theme.frontGrad}; filter: blur(34px);"></div>
+
+              <!-- Baris Atas: Nomor, Pengingat Hanzi FZKai & Unit -->
+              <div class="relative z-10 flex items-center justify-between gap-3">
+                <span class="inline-flex items-center justify-center px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl text-white font-black text-lg sm:text-2xl shadow-sm"
+                      style="background: ${theme.frontGrad};">
+                  #${index + 1}
+                </span>
+
+                <span translate="no" class="notranslate hanzi-font text-3xl sm:text-5xl font-bold px-5 py-1 rounded-2xl bg-white/95 shadow-sm border border-slate-200"
+                      style="color: ${theme.accentText};">
+                  ${item.hanzi}
+                </span>
+
+                <span translate="no" class="notranslate px-4 sm:px-5 py-1.5 sm:py-2 rounded-full font-extrabold text-sm sm:text-lg bg-white/95 border border-slate-200 shadow-sm"
+                      style="color: ${theme.accentText};">
+                  ${item.unit}
+                </span>
+              </div>
+
+              <!-- Tengah: Pinyin & Arti Bahasa Indonesia Ukuran Besar -->
+              <div class="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 my-2 gap-3 sm:gap-5">
+                <div translate="no" class="notranslate text-4xl sm:text-6xl lg:text-7xl font-black tracking-wide leading-tight"
+                     style="color: ${theme.accentText};">
+                  ${item.pinyin}
+                </div>
+
+                <div class="w-28 sm:w-40 h-1.5 rounded-full opacity-45" style="background: ${theme.frontGrad};"></div>
+
+                <div translate="no" class="notranslate text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-snug max-w-3xl">
+                  ${item.arti}
+                </div>
+              </div>
+
+              <!-- Bawah: Petunjuk Balikkan Kembali -->
+              <div class="relative z-10 flex justify-center">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 text-slate-600 border border-slate-200 text-xs sm:text-base font-bold shadow-xs">
+                  ↺ Klik kartu untuk kembali ke Hanzi
+                </span>
+              </div>
+            </div>
+
+          </div>
+        `;
+
+        cardScene.addEventListener("click", () => {
+          if (isTransitioning) return;
+          isFlipped = !isFlipped;
+          const inner = cardScene.querySelector(".card-inner");
+          if (isFlipped) {
+            inner.classList.add("is-flipped");
+            playTone("flip");
+            spawnSparkles(cardScene, 10);
+          } else {
+            inner.classList.remove("is-flipped");
+            playTone("nav");
+          }
+        });
+
+        return cardScene;
+      }
+
+      function buildCompletionCard() {
+        const doneBox = document.createElement("div");
+        doneBox.setAttribute("translate", "no");
+        doneBox.className = [
+          "notranslate anim-shuffle-in w-full h-full rounded-[2rem] border-4 border-indigo-300",
+          "bg-gradient-to-br from-indigo-50 via-white to-sky-100 shadow-2xl",
+          "flex flex-col items-center justify-center text-center p-6 sm:p-12 gap-5 overflow-hidden relative"
+        ].join(" ");
+
+        doneBox.innerHTML = `
+          <div class="text-6xl sm:text-8xl drop-shadow">🎉</div>
+          <div class="space-y-2.5 max-w-2xl">
+            <span class="inline-block px-4 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs sm:text-sm font-black uppercase tracking-wider">
+              Putaran ${roundCount} Selesai!
+            </span>
+            <h2 class="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight">
+              Luar Biasa! Semua 396 Kosakata Selesai
+            </h2>
+            <p class="text-sm sm:text-lg font-semibold text-slate-600">
+              Klik tombol di bawah atau tekan <strong>Next ➔</strong> untuk mengacak ulang seluruh kosakata dan memulai putaran baru.
+            </p>
+          </div>
+          <button id="btnRestartRound" type="button"
+            class="mt-2 flex items-center gap-3 px-7 sm:px-10 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 active:scale-95 text-white text-base sm:text-xl font-black shadow-xl shadow-blue-500/30 transition transform hover:scale-105 cursor-pointer">
+            <span>🔀</span>
+            <span>Mulai Baru &amp; Acak Kosakata</span>
+          </button>
+        `;
+
+        const restartBtn = doneBox.querySelector("#btnRestartRound");
+        restartBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          startNewShuffledRound(true);
+        });
+
+        return doneBox;
+      }
+
+      function renderImmediate(enterAnimClass) {
+        updateUIControls();
+        cardStageEl.innerHTML = "";
+
+        if (isCompleted) {
+          const doneCard = buildCompletionCard();
+          cardStageEl.appendChild(doneCard);
+          spawnSparkles(doneCard, 16);
+        } else {
+          const item = currentDeck[currentIndex];
+          const cardEl = buildSingleCard(item, currentIndex, enterAnimClass);
+          cardStageEl.appendChild(cardEl);
+        }
+      }
+
+      function transitionTo(direction, updateFn) {
+        if (isTransitioning) return;
+        const currentEl = cardStageEl.firstElementChild;
+
+        if (!currentEl) {
+          updateFn();
+          renderImmediate(direction === "prev" ? "anim-enter-prev" : "anim-enter-next");
+          return;
+        }
+
+        isTransitioning = true;
+        const exitClass = direction === "prev" ? "anim-exit-prev" : "anim-exit-next";
+        const enterClass = direction === "prev" ? "anim-enter-prev" : "anim-enter-next";
+
+        currentEl.classList.remove("anim-enter-next", "anim-enter-prev", "anim-shuffle-in");
+        currentEl.classList.add(exitClass);
+
+        setTimeout(() => {
+          updateFn();
+          renderImmediate(enterClass);
+          isTransitioning = false;
+        }, 240);
+      }
+
+      function goToNext() {
+        if (isTransitioning) return;
+
+        // Jika sudah selesai semua, klik Next otomatis mengacak ulang & mulai baru
+        if (isCompleted) {
+          startNewShuffledRound(true);
+          return;
+        }
+
+        if (currentIndex < currentDeck.length - 1) {
+          playTone("nav");
+          transitionTo("next", () => {
+            currentIndex++;
+            isFlipped = false;
+          });
+        } else {
+          playTone("complete");
+          transitionTo("next", () => {
+            isCompleted = true;
+            isFlipped = false;
+          });
+        }
+      }
+
+      function goToPrev() {
+        if (isTransitioning) return;
+
+        if (isCompleted) {
+          playTone("nav");
+          transitionTo("prev", () => {
+            isCompleted = false;
+            currentIndex = currentDeck.length - 1;
+            isFlipped = false;
+          });
+          return;
+        }
+
+        if (currentIndex > 0) {
+          playTone("nav");
+          transitionTo("prev", () => {
+            currentIndex--;
+            isFlipped = false;
+          });
+        }
+      }
+
+      function startNewShuffledRound(incrementRound) {
+        if (isTransitioning) return;
+        if (incrementRound) roundCount++;
+        currentDeck = shuffleArray(VOCAB_LIST);
+        currentIndex = 0;
+        isFlipped = false;
+        isCompleted = false;
+        playTone("nav");
+        renderImmediate("anim-shuffle-in");
+        if (cardStageEl.firstElementChild) {
+          spawnSparkles(cardStageEl.firstElementChild, 12);
+        }
+      }
+
+      // Event Listeners Navigasi & Kontrol
+      btnNextEl.addEventListener("click", goToNext);
+      btnPrevEl.addEventListener("click", goToPrev);
+      btnNewStartEl.addEventListener("click", () => startNewShuffledRound(true));
+
+      btnOpenInstructionsEl.addEventListener("click", () => {
+        instructionsModalEl.classList.remove("hidden");
+        instructionsModalEl.classList.add("flex");
+      });
+
+      btnCloseInstructionsEl.addEventListener("click", () => {
+        instructionsModalEl.classList.add("hidden");
+        instructionsModalEl.classList.remove("flex");
+      });
+
+      // Dukungan Keyboard (Panah Kanan/Kiri untuk pindah kartu, Spasi/Enter untuk balik kartu)
+      document.addEventListener("keydown", (e) => {
+        if (!instructionsModalEl.classList.contains("hidden")) {
+          if (e.key === "Escape" || e.key === "Enter") {
+            instructionsModalEl.classList.add("hidden");
+            instructionsModalEl.classList.remove("flex");
+          }
+          return;
+        }
+
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          goToNext();
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          goToPrev();
+        } else if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          if (isCompleted) {
+            startNewShuffledRound(true);
+          } else if (cardStageEl.firstElementChild) {
+            cardStageEl.firstElementChild.click();
+          }
+        }
+      });
+
+      // Inisialisasi Awal (Langsung teracak saat mulai baru)
+      renderImmediate("anim-shuffle-in");
+    })();
+  </script>
+</body>
+</html>
